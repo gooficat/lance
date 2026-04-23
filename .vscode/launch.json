@@ -1,0 +1,16 @@
+{
+	"configurations": [
+		{
+			"name": "(gdb) Launch",
+			"type": "cppvsdbg",
+			"request": "launch",
+			"program": "enter program name, for example ${workspaceFolder}/a.exe",
+			"args": [
+				"tests/1.lm"
+			],
+			"stopAtEntry": false,
+			"cwd": "${fileDirname}",
+			"environment": [],
+		}
+	]
+}
