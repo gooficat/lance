@@ -15,6 +15,7 @@ struct Expr
 {
 	enum ExprType
 	{
+		EXPR_NIL,
 		EXPR_VAR,
 		EXPR_ABS,
 		EXPR_APP,
@@ -43,14 +44,16 @@ void Expr_print(struct Expr *self)
 		printf("%c", self->var);
 		break;
 	case EXPR_ABS:
-		printf("λ%c.", self->abs.name);
+		printf("\\%c.", self->abs.name);
 		Expr_print(self->abs.expr);
 		break;
 	case EXPR_APP:
 		putchar('(');
 		Expr_print(self->app.a);
+		putchar(' ');
 		Expr_print(self->app.b);
 		putchar(')');
+	default:
 		break;
 	}
 }
@@ -61,21 +64,26 @@ const char *Expr_parse(struct Expr *expr, const char *s)
 	{
 	case '\\':
 		expr->type = EXPR_ABS;
-		expr->abs.name = *++s;
+		++s;
+		expr->abs.name = *s;
 		expr->abs.expr = malloc(sizeof *expr->abs.expr);
-		s = Expr_parse(expr->abs.expr, ++s);
+		s += 2;
+		s = Expr_parse(expr->abs.expr, s);
 		break;
 	case '(':
 		expr->type = EXPR_APP;
 		expr->app.a = malloc(sizeof *expr->app.a);
 		expr->app.b = malloc(sizeof *expr->app.b);
-		s = Expr_parse(expr->app.a, ++s);
-		s = Expr_parse(expr->app.b, ++s);
+		++s;
+		s = Expr_parse(expr->app.a, s);
+		++s;
+		s = Expr_parse(expr->app.b, s);
 		++s;
 		break;
 	default:
 		expr->type = EXPR_VAR;
 		expr->var = *s++;
+		break;
 	}
 	return s;
 }
@@ -86,7 +94,11 @@ char *dump_file(const char *path)
 	char *contents;
 	long l;
 	size_t rl;
+#ifndef _WIN32
 	file = fopen(path, "rt");
+#else
+	fopen_s(&file, path, "rt");
+#endif
 	if (!file)
 	{
 		fatal("Failure opening file for reading");
@@ -119,9 +131,13 @@ struct Expr *read_program(const char *path)
 	content = dump_file(path);
 	expr = malloc(sizeof *expr);
 
-	while (*content != '\0')
+	if (*content != '\0')
 	{
 		content = Expr_parse(expr, content);
+	}
+	else
+	{
+		expr->type = EXPR_NIL;
 	}
 
 	return expr;
