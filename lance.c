@@ -56,7 +56,7 @@ void Expr_print(struct Expr *self)
 		putchar(')');
 		break;
 	default:
-		puts("Nil");
+		printf("Nil");
 		break;
 	}
 }
@@ -177,6 +177,10 @@ struct Expr *substitute(struct Expr *expr, char v, struct Expr *sub)
 	case EXPR_ABS:
 		if (expr->abs.name != v)
 			expr->abs.expr = substitute(expr->abs.expr, v, sub);
+		else
+		{
+			// expr->abs.name =
+		}
 		free(old);
 		return expr;
 	case EXPR_APP:
@@ -197,6 +201,8 @@ struct Expr *beta_reduction(struct Expr *expr)
 {
 	if (expr->type == EXPR_APP)
 		return substitute(expr->app.a->abs.expr, expr->app.a->abs.name, expr->app.b);
+	if (expr->type == EXPR_ABS)
+		expr->abs.expr = beta_reduction(expr->abs.expr);
 	return expr;
 }
 
