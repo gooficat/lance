@@ -50,7 +50,6 @@ void Expr_print(struct Expr *self)
 	case EXPR_APP:
 		putchar('(');
 		Expr_print(self->app.a);
-		putchar(' ');
 		Expr_print(self->app.b);
 		putchar(')');
 	default:
@@ -76,7 +75,6 @@ const char *Expr_parse(struct Expr *expr, const char *s)
 		expr->app.b = malloc(sizeof *expr->app.b);
 		++s;
 		s = Expr_parse(expr->app.a, s);
-		++s;
 		s = Expr_parse(expr->app.b, s);
 		++s;
 		break;
@@ -141,6 +139,11 @@ struct Expr *read_program(const char *path)
 	}
 
 	return expr;
+}
+
+struct Expr *interpret(const struct Expr *expr)
+{
+	//
 }
 
 int main(int argc, char **argv)
