@@ -9,7 +9,7 @@
 				"tests/1.lm"
 			],
 			"stopAtEntry": false,
-			"cwd": "${fileDirname}",
+			"cwd": "${workspaceRoot}",
 			"environment": [],
 			"preLaunchTask": "CMake: build",
 			"console": "integratedTerminal"
