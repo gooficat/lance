@@ -28,5 +28,6 @@ int main(int argc, char *argv[])
 		new_tree = tree->Reduce();
 	}
 	std::println("{}", *tree);
+	// delete tree;
 	return 0;
 }
