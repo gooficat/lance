@@ -284,7 +284,12 @@ int main(int argc, char *argv[])
 	std::string_view view = content;
 	auto tree = ParseExpr(view);
 	std::println("{}", *tree);
-	tree = tree->Reduce();
+	auto new_tree = tree->Reduce();
+	while (tree != new_tree)
+	{
+		tree = new_tree;
+		new_tree = tree->Reduce();
+	}
 	std::println("{}", *tree);
 	// delete tree;
 	return 0;
