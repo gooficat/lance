@@ -4,9 +4,9 @@ is equivalent to this javascript
 or in pre-es6
 `function(f) {return f}`
 
-`(\f.f x)`
+`(\f.fx)`
 is equivalent to
-`((f) => f)()`
+`((f) => f)(x)`
 ie a function call
 
 variables are 1 letter long
@@ -14,7 +14,7 @@ variables are 1 letter long
 
 the way lambda calculus is "interpreted" is by collapsing it into the most reduced form
 so, this
-`(\f.f x)`
+`(\f.fx)`
 turns into
 `x`
 because it is a function that returns the argument, called with `x`, which is an "unbound" variable,
