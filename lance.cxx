@@ -2,8 +2,11 @@
 
 #include <cstddef>
 #include <format>
+#include <fstream>
 #include <optional>
 #include <print>
+#include <sstream>
+#include <stdexcept>
 #include <string>
 #include <string_view>
 #include <unordered_map>
@@ -267,9 +270,17 @@ Expr *ParseExpr(std::string_view &v)
 	}
 }
 
-int main()
+int main(int argc, char *argv[])
 {
-	std::string content = "(\\x.xy)";
+	if (argc != 2)
+	{
+		throw std::runtime_error("Wrong args");
+	}
+	std::ifstream in(argv[1]);
+	std::stringstream insstrm;
+	insstrm << in.rdbuf();
+	in.close();
+	std::string content = insstrm.str();
 	std::string_view view = content;
 	auto tree = ParseExpr(view);
 	std::println("{}", *tree);
