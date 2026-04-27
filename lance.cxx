@@ -24,6 +24,8 @@ class Expr
 	}
 
 	virtual void CollectFree(std::unordered_set<std::string> &bound, std::unordered_set<std::string> &free) const = 0;
+
+	virtual void Substitute(const std::string &var, const Expr *expr) = 0;
 };
 
 template <>
@@ -54,6 +56,14 @@ class ExprVar : public Expr
 		if (not bound.contains(name))
 		{
 			free.insert(name);
+		}
+	}
+
+	void Substitute(const std::string &var, const Expr *expr) override
+	{
+		if (this->name == var)
+		{
+			//
 		}
 	}
 
@@ -88,6 +98,14 @@ class ExprAbs : public Expr
 			bound.erase(param);
 	}
 
+	void Substitute(const std::string &var, const Expr *expr) override
+	{
+		if (param != var)
+		{
+			body->Substitute(var, expr);
+		}
+	}
+
   private:
 	std::string param;
 	Expr *body;
@@ -114,6 +132,12 @@ class ExprApp : public Expr
 	{
 		caller->CollectFree(bound, free);
 		callee->CollectFree(bound, free);
+	}
+
+	void Substitute(const std::string &var, const Expr *expr) override
+	{
+		caller->Substitute(var, expr);
+		callee->Substitute(var, expr);
 	}
 
   private:
