@@ -23,9 +23,18 @@ class Expr
 	{
 	}
 
+	std::unordered_set<std::string> GetFree() const
+	{
+		std::unordered_set<std::string> bound, free;
+		CollectFree(bound, free);
+		return free;
+	}
+
 	virtual void CollectFree(std::unordered_set<std::string> &bound, std::unordered_set<std::string> &free) const = 0;
 
-	virtual void Substitute(const std::string &var, const Expr *expr) = 0;
+	virtual Expr *Substitute(const std::string &var, const Expr *expr) = 0;
+
+	virtual Expr *Duplicate() const = 0;
 };
 
 template <>
@@ -59,12 +68,19 @@ class ExprVar : public Expr
 		}
 	}
 
-	void Substitute(const std::string &var, const Expr *expr) override
+	Expr *Substitute(const std::string &var, const Expr *expr) override
 	{
 		if (this->name == var)
 		{
-			//
+			delete this;
+			return expr->Duplicate();
 		}
+		return this;
+	}
+
+	Expr *Duplicate() const override
+	{
+		return new ExprVar(name);
 	}
 
   private:
@@ -98,12 +114,25 @@ class ExprAbs : public Expr
 			bound.erase(param);
 	}
 
-	void Substitute(const std::string &var, const Expr *expr) override
+	Expr *Substitute(const std::string &var, const Expr *expr) override
 	{
-		if (param != var)
+		if (param == var)
 		{
-			body->Substitute(var, expr);
+			return this;
 		}
+		if (GetFree().contains(var))
+		{
+			Disambiguate();
+			auto new_body = body->Substitute(var, expr);
+			delete this;
+			return new ExprAbs(param, new_body);
+		}
+		body->Substitute(var, expr);
+	}
+
+	Expr *Duplicate() const override
+	{
+		return new ExprAbs(param, body->Duplicate());
 	}
 
   private:
@@ -112,6 +141,23 @@ class ExprAbs : public Expr
 	virtual std::string ToString() const override
 	{
 		return std::format("λ{}.{}", param, body->ToString());
+	}
+
+	void Disambiguate()
+	{
+		static std::unordered_map<char, size_t> counts;
+		char c = param[0];
+		size_t v;
+		if (counts.contains(c))
+		{
+			v = counts.at(c)++;
+		}
+		else
+		{
+			counts.insert({c, 1});
+			v = 1;
+		}
+		param = std::format("{}{}", c, v);
 	}
 };
 
@@ -134,10 +180,16 @@ class ExprApp : public Expr
 		callee->CollectFree(bound, free);
 	}
 
-	void Substitute(const std::string &var, const Expr *expr) override
+	Expr *Substitute(const std::string &var, const Expr *expr) override
 	{
-		caller->Substitute(var, expr);
-		callee->Substitute(var, expr);
+		delete this;
+		return new ExprApp(caller->Substitute(var, expr),
+						   callee->Substitute(var, expr));
+	}
+
+	Expr *Duplicate() const override
+	{
+		return new ExprApp(caller->Duplicate(), callee->Duplicate());
 	}
 
   private:
