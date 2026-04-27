@@ -35,6 +35,10 @@ class Expr
 	virtual Expr *Substitute(const std::string &var, const Expr *expr) = 0;
 
 	virtual Expr *Duplicate() const = 0;
+
+	virtual Expr *Reduce() = 0;
+
+	virtual Expr *Call(const Expr *param) = 0;
 };
 
 template <>
@@ -56,8 +60,8 @@ class ExprVar : public Expr
 
 	~ExprVar()
 	{
-		if (value.has_value())
-			delete value.value();
+		// if (value.has_value())
+		// delete value.value();
 	}
 
 	void CollectFree(std::unordered_set<std::string> &bound, std::unordered_set<std::string> &free) const override
@@ -72,7 +76,7 @@ class ExprVar : public Expr
 	{
 		if (this->name == var)
 		{
-			delete this;
+			// delete this;
 			return expr->Duplicate();
 		}
 		return this;
@@ -83,10 +87,20 @@ class ExprVar : public Expr
 		return new ExprVar(name);
 	}
 
+	Expr *Reduce() override
+	{
+		return this;
+	}
+
+	Expr *Call(const Expr *param) override
+	{
+		return this;
+	}
+
   private:
 	std::string name;
 	std::optional<Expr *> value;
-	virtual std::string ToString() const override
+	std::string ToString() const override
 	{
 		return name;
 	}
@@ -101,7 +115,8 @@ class ExprAbs : public Expr
 	}
 	~ExprAbs()
 	{
-		delete body;
+		// if (body)
+		// delete body;
 	}
 
 	void CollectFree(std::unordered_set<std::string> &bound, std::unordered_set<std::string> &free) const override
@@ -124,7 +139,7 @@ class ExprAbs : public Expr
 		{
 			Disambiguate();
 			auto new_body = body->Substitute(var, expr);
-			delete this;
+			// delete this;
 			return new ExprAbs(param, new_body);
 		}
 		body->Substitute(var, expr);
@@ -135,10 +150,21 @@ class ExprAbs : public Expr
 		return new ExprAbs(param, body->Duplicate());
 	}
 
+	Expr *Reduce() override
+	{
+		// TODO
+		return this;
+	}
+
+	Expr *Call(const Expr *param) override
+	{
+		return body->Substitute(this->param, param);
+	}
+
   private:
 	std::string param;
 	Expr *body;
-	virtual std::string ToString() const override
+	std::string ToString() const override
 	{
 		return std::format("λ{}.{}", param, body->ToString());
 	}
@@ -170,8 +196,10 @@ class ExprApp : public Expr
 	}
 	~ExprApp()
 	{
-		delete caller;
-		delete callee;
+		// if (caller)
+		// delete caller;
+		// if (callee)
+		// delete callee;
 	}
 
 	void CollectFree(std::unordered_set<std::string> &bound, std::unordered_set<std::string> &free) const override
@@ -182,7 +210,7 @@ class ExprApp : public Expr
 
 	Expr *Substitute(const std::string &var, const Expr *expr) override
 	{
-		delete this;
+		// delete this;
 		return new ExprApp(caller->Substitute(var, expr),
 						   callee->Substitute(var, expr));
 	}
@@ -191,11 +219,22 @@ class ExprApp : public Expr
 	{
 		return new ExprApp(caller->Duplicate(), callee->Duplicate());
 	}
+	Expr *Reduce() override
+	{
+		auto new_expr = caller->Call(callee);
+		// delete this;
+		return new_expr;
+	}
+
+	Expr *Call(const Expr *param) override
+	{
+		return this;
+	}
 
   private:
 	Expr *caller;
 	Expr *callee;
-	virtual std::string ToString() const override
+	std::string ToString() const override
 	{
 		return std::format("({} {})", *caller, *callee);
 	}
@@ -234,6 +273,8 @@ int main()
 	std::string_view view = content;
 	auto tree = ParseExpr(view);
 	std::println("{}", *tree);
-	delete tree;
+	tree = tree->Reduce();
+	std::println("{}", *tree);
+	// delete tree;
 	return 0;
 }
