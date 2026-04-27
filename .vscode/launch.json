@@ -4,7 +4,7 @@
 			"name": "(gdb) Launch",
 			"type": "cppvsdbg",
 			"request": "launch",
-			"program": "${workspaceRoot}/build/Debug/${workspaceFolderBasename}",
+			"program": "${workspaceRoot}/build/${workspaceFolderBasename}",
 			"args": [
 				"tests/1.lm"
 			],

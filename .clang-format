@@ -1,5 +1,6 @@
 ---
-Language: C
+Language: Cpp
 BasedOnStyle: Microsoft
 UseTab: Always
 BreakBeforeBraces: Allman
+ColumnLimit: 0

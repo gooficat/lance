@@ -1,5 +1,5 @@
 {
 	"clangd.arguments": [
-		"--compile-commands-dir=${workspaceRoot}"
+		"--compile-commands-dir=${workspaceRoot}/build"
 	]
 }

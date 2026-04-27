@@ -1,3 +1,3 @@
-### lance - a lambda calculus interpreter in pure, dependency-free, single file C90
+### lance - a single-file lambda calculus interpreter
 
 --- note: this project is not in a usable state!
