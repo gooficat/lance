@@ -10,6 +10,8 @@ The syntax is as follows:
 
 The interpreter will reprint your expression with a slightly different syntax (which uses spaces between the abstraction and argument of an application, and the greek lambda symbol instead of a backslash), followed by each successive reduction step until no further reductions are possible. 
 
+It is important to note that there is no brace elision, unlike many lambda calculus interpreters. This is a very deliberate design choice.
+
 known issues:
 - lack of error handling for malformed expressions
 - no deletion-after-substitution
