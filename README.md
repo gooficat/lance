@@ -1,7 +1,6 @@
 ### lance - a lambda calculus interpreter
 
---- note: this project is being actively worked on and may not work as expected
+--- note: this project is being actively worked!
 
-known bugs:
+known issues:
 - lack of error handling for malformed expressions
-- alpha renaming is buggy

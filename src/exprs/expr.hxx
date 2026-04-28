@@ -9,7 +9,7 @@ class Expr
 {
   public:
 	virtual std::string ToString() const = 0;
-	virtual ~Expr() = 0;
+	virtual ~Expr();
 
 	std::unordered_set<std::string> GetFree() const;
 

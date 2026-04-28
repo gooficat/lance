@@ -10,7 +10,7 @@ void ExprAbs::Disambiguate()
 	}
 	else
 	{
-		counts.insert({c, 1});
+		counts.insert({c, 2});
 		v = 1;
 	}
 	param = std::format("{}{}", c, v);

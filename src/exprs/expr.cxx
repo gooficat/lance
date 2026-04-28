@@ -10,6 +10,10 @@ std::unordered_set<std::string> Expr::GetFree() const
 	return free;
 }
 
+Expr::~Expr()
+{
+}
+
 Expr *ParseExpr(std::string_view &v)
 {
 	switch (v[0])
