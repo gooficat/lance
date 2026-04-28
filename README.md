@@ -4,3 +4,4 @@
 
 known issues:
 - lack of error handling for malformed expressions
+- no deletion-after-substitution
